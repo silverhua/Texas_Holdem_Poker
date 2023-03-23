@@ -39,6 +39,7 @@ public class Game {
             winnerlist.clear();
             betnum=smallblind*2;
             allincount=0;
+            pot=0;
             //发牌
             deliverCard();
             playeringame.addAll(playerlist);
@@ -58,6 +59,7 @@ public class Game {
                 }else{
                     System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得比赛");
                     playeringame.get(0).winpot(pot);
+                    System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得"+pot);
                     //判断是否有人淘汰
                     haveEnoughChips();
                     //下一个人小盲
