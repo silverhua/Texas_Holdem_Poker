@@ -305,6 +305,7 @@ public class Game {
                                 playerlist.get(i).setStatus("ALLIN");
                                 pot += playerlist.get(i).getMoney();
                                 playerlist.get(i).bet(playerlist.get(i).getMoney());
+                                betnum=playerlist.get(i).getTotalbet();
                                 allincount++;
                                 break;
                             }else if(action.equals("fold")){
@@ -326,6 +327,7 @@ public class Game {
                                     int playerbet = scan.nextInt();
                                     if (playerbet <= playerlist.get(i).getMoney()&&playerbet+playerlist.get(i).getTotalbet()>=betnum) {
                                         playerlist.get(i).bet(playerbet);
+                                        betnum=playerlist.get(i).getTotalbet();
                                         pot += playerbet;
                                         if (playerlist.get(i).getMoney() == playerbet) {
                                             playerlist.get(i).setStatus("ALLIN");
@@ -340,6 +342,7 @@ public class Game {
                                 playerlist.get(i).setStatus("ALLIN");
                                 pot += playerlist.get(i).getMoney();
                                 playerlist.get(i).bet(playerlist.get(i).getMoney());
+                                betnum=playerlist.get(i).getTotalbet();
                                 allincount++;
                                 break;
                             } else if (action.equals("fold")) {
@@ -362,6 +365,7 @@ public class Game {
                                 int playerbet = scan.nextInt();
                                 if (playerbet <= playerlist.get(i).getMoney()&&playerbet+playerlist.get(i).getTotalbet()>=betnum){
                                     playerlist.get(i).bet(playerbet);
+                                    betnum=playerlist.get(i).getTotalbet();
                                     pot+=playerbet;
                                     break;
                                 }
@@ -372,6 +376,7 @@ public class Game {
                             playerlist.get(i).setStatus("ALLIN");
                             pot+=playerlist.get(i).getMoney();
                             playerlist.get(i).bet(playerlist.get(i).getMoney());
+                            betnum=playerlist.get(i).getTotalbet();
                             break;
                         } else if (action.equals("fold")) {
                             playerlist.get(i).setStatus("FOLD");
@@ -385,9 +390,7 @@ public class Game {
                         System.out.println("输入错误，请重新输入");
                     }
                 }
-                if(betnum<playerlist.get(i).getTotalbet()){
-                    betnum=playerlist.get(i).getTotalbet();
-                }
+
                 int n=i+1;
                 if(n>=playerlist.size()){
                     n=0;
