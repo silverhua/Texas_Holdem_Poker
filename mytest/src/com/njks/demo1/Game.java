@@ -3,170 +3,165 @@ package com.njks.demo1;
 import java.util.*;
 
 public class Game {
-    private int bigblindpointer=1;
-    private int smallblindpointer=0;
-    private int smallblind;
-    private int player;
-    private CardDeck deck1 = new CardDeck();
+
+
+    private int bigBlindPointer =1;
+    private int smallBlindPointer =0;
+    private final int smallBlind;
+    private final CardDeck deck1 = new CardDeck();
     private int pot;
-    private ArrayList<Player> playerlist= new ArrayList<>();
-    private Scanner scan = new Scanner(System.in);
-    private ArrayList<Player> playeringame = new ArrayList<>();
-    private ArrayList<Card> communitycard = new ArrayList<>();
-    private ArrayList<Player> winner=new ArrayList<>();
-    private ArrayList<Player> winnerlist=new ArrayList<>();
+    private final ArrayList<Player> playerList = new ArrayList<>();
+    private final Scanner scan = new Scanner(System.in);
+    private final ArrayList<Player> playerInGame = new ArrayList<>();
+    private final ArrayList<Card> communityCard = new ArrayList<>();
+    private final ArrayList<Player> winnerList =new ArrayList<>();
     private boolean allIn = false;
-    private int betnum=0;
-    private int allincount=0;
+    private int betNum =0;
+    private int allInCounter =0;
     public Game(){
         System.out.println("请输入玩家数：");
-        player=scan.nextInt();
-        for(int i=1;i<=player;i++){
+        int player = scan.nextInt();
+        for(int i = 1; i<= player; i++){
             System.out.println("请输入玩家"+i+"的初始金钱:");
-            playerlist.add(new Player(i,scan.nextInt()));
+            playerList.add(new Player(i,scan.nextInt()));
         }
         System.out.println("请输入小盲：");
-        smallblind= scan.nextInt();
+        smallBlind = scan.nextInt();
         System.out.println("游戏开始");
     }
     public void play(){
-        while(playerlist.size()>1){
+        while(playerList.size()>1){
             //清空上局数据
-            deck1.reset();
-            playeringame.clear();
-            resetPlayer(playerlist);
-            communitycard.clear();
-            winnerlist.clear();
-            betnum=smallblind*2;
-            allincount=0;
-            pot=0;
+            resetTheRound();
             //发牌
-            deliverCard();
-            playeringame.addAll(playerlist);
+            deliverCard(playerInGame);
             //下大小盲
             blind();
             //初始下注
             if(!allIn){
-                betsession(playeringame);
+                betSession(playerInGame);
             }
             if(!allIn){
-                if(playeringame.size()!=1) {
+                if(playerInGame.size()!=1) {
                     //发三张公共牌
-                    communitycard.add(deck1.drawCard());
-                    communitycard.add(deck1.drawCard());
-                    communitycard.add(deck1.drawCard());
-                    betsession(playeringame);
+                    communityCard.add(deck1.drawCard());
+                    communityCard.add(deck1.drawCard());
+                    communityCard.add(deck1.drawCard());
+                    betSession(playerInGame);
                 }else{
-                    System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得比赛");
-                    playeringame.get(0).winpot(pot);
-                    System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得"+pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得比赛");
+                    playerInGame.get(0).winPot(pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得"+pot);
                     //判断是否有人淘汰
                     haveEnoughChips();
                     //下一个人小盲
-                    smallblindpointer++;
-                    if (smallblindpointer>=playeringame.size()){
-                        smallblindpointer=0;
-                    }
-                    bigblindpointer=smallblindpointer+1;
-                    if (bigblindpointer>=playeringame.size()){
-                        bigblindpointer=0;
-                    }
+                    nextSmallBlind();
                     continue;
                 }
             }
             if (!allIn){
-                if(playeringame.size()!=1) {
+                if(playerInGame.size()!=1) {
                     //转牌下注
-                    communitycard.add(deck1.drawCard());
-                    betsession(playeringame);
+                    communityCard.add(deck1.drawCard());
+                    betSession(playerInGame);
                 }else{
-                    System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得比赛");
-                    playeringame.get(0).winpot(pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得比赛");
+                    playerInGame.get(0).winPot(pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得"+pot);
                     //判断是否有人淘汰
                     haveEnoughChips();
                     //下一个人小盲
-                    smallblindpointer++;
-                    if (smallblindpointer>=playeringame.size()){
-                        smallblindpointer=0;
-                    }
-                    bigblindpointer=smallblindpointer+1;
-                    if (bigblindpointer>=playeringame.size()){
-                        bigblindpointer=0;
-                    }
+                    nextSmallBlind();
                     continue;
                 }
             }
             if(!allIn){
-                if(playeringame.size()!=1) {
+                if(playerInGame.size()!=1) {
                     //河牌下注
-                    communitycard.add(deck1.drawCard());
-                    betsession(playeringame);
+                    communityCard.add(deck1.drawCard());
+                    betSession(playerInGame);
                 }else{
-                    System.out.println("玩家"+playeringame.get(0).getPlayerid()+"赢得比赛");
-                    playeringame.get(0).winpot(pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得比赛");
+                    playerInGame.get(0).winPot(pot);
+                    System.out.println("玩家"+ playerInGame.get(0).getPlayerId()+"赢得"+pot);
                     //判断是否有人淘汰
                     haveEnoughChips();
                     //下一个人小盲
-                    smallblindpointer++;
-                    if (smallblindpointer>=playeringame.size()){
-                        smallblindpointer=0;
-                    }
-                    bigblindpointer=smallblindpointer+1;
-                    if (bigblindpointer>=playeringame.size()){
-                        bigblindpointer=0;
-                    }
+                    nextSmallBlind();
                     continue;
                 }
             }
-            //补齐5张公共牌
-            while(communitycard.size()<5){
-                communitycard.add(deck1.drawCard());
+            if(playerInGame.size()!=1) {
+                //补齐5张公共牌
+                while(communityCard.size()<5){
+                    communityCard.add(deck1.drawCard());
+                }
+                //显示所有公共牌
+                System.out.println("公共牌为：");
+                for(Card x: communityCard){
+                    x.print();
+                }
+                //分钱
+                potDeliver(playerInGame, communityCard);
+                //判断是否有人淘汰
+                haveEnoughChips();
+                //下一个人小盲
+                nextSmallBlind();
+            }else {
+                System.out.println("玩家" + playerInGame.get(0).getPlayerId() + "赢得比赛");
+                playerInGame.get(0).winPot(pot);
+                System.out.println("玩家" + playerInGame.get(0).getPlayerId() + "赢得" + pot);
+                //判断是否有人淘汰
+                haveEnoughChips();
+                //下一个人小盲
+                nextSmallBlind();
             }
-            //显示所有公共牌
-            System.out.println("公共牌为：");
-            for(Card x:communitycard){
-                x.print();
-            }
-
-            //分钱
-            potdeliver(playeringame,communitycard);
-            //判断是否有人淘汰
-            haveEnoughChips();
-            //下一个人小盲
-            smallblindpointer++;
-            if (smallblindpointer>=playeringame.size()){
-                smallblindpointer=0;
-            }
-            bigblindpointer=smallblindpointer+1;
-            if (bigblindpointer>=playeringame.size()){
-                bigblindpointer=0;
-            }
-
         }
-        System.out.println("玩家"+playerlist.get(0).getPlayerid()+"是最终赢家");
-        System.out.println("他的最终筹码是："+playerlist.get(0).getMoney());
+        System.out.println("玩家"+ playerList.get(0).getPlayerId()+"是最终赢家");
+        System.out.println("他的最终筹码是："+ playerList.get(0).getMoney());
     }
-
-    private void potdeliver(ArrayList<Player> playeringame,ArrayList<Card> communitycard){
-        winnerlist.addAll(findWinner(playeringame,communitycard));
-        for(Player x:winnerlist) {
-            System.out.println("玩家"+x.getPlayerid()+"获得胜利");
+    private void nextSmallBlind(){
+        smallBlindPointer++;
+        if (smallBlindPointer >= playerList.size()){
+            smallBlindPointer =0;
+        }
+        bigBlindPointer = smallBlindPointer +1;
+        if (bigBlindPointer >= playerList.size()){
+            bigBlindPointer =0;
+        }
+    }
+    private void resetTheRound(){
+        deck1.reset();
+        playerInGame.clear();
+        resetPlayer(playerList);
+        communityCard.clear();
+        winnerList.clear();
+        betNum = smallBlind *2;
+        allInCounter =0;
+        pot=0;
+        allIn =false;
+        playerInGame.addAll(playerList);
+    }
+    private void potDeliver(ArrayList<Player> playerInGame, ArrayList<Card> communityCard){
+        winnerList.addAll(findWinner(playerInGame,communityCard));
+        for(Player x: winnerList) {
+            System.out.println("玩家"+x.getPlayerId()+"获得胜利");
         }
         System.out.println("底池为："+pot);
 
         // distribute the pot
-        Map<Player, Integer> payouts = distributePot(winnerlist, communitycard, pot);
-        for (Player winner : winnerlist) {
+        Map<Player, Integer> payouts = distributePot(winnerList, communityCard, pot);
+        for (Player winner : winnerList) {
             int amountWon = payouts.get(winner);
-            winner.winpot(amountWon);
+            winner.winPot(amountWon);
             pot -= amountWon;
-            System.out.println("玩家"+winner.getPlayerid()+"赢得"+amountWon);
+            System.out.println("玩家"+winner.getPlayerId()+"赢得"+amountWon);
         }
         System.out.println("一轮结束");
     }
 
 
-    public static Map<Player, Integer> distributePot(ArrayList<Player> players, ArrayList<Card> communityCards, int pot) {
+    private static Map<Player, Integer> distributePot(ArrayList<Player> players, ArrayList<Card> communityCards, int pot) {
         // evaluate the strength of each player's hand
         Map<Player, Integer> playerRanks = new HashMap<>();
         for (Player player : players) {
@@ -215,10 +210,10 @@ public class Game {
             normalRemainder = pot % normalWinners.size();
             for (int i = 0; i < normalWinners.size(); i++) {
                 Player winner = normalWinners.get(i);
-                winner.setTotalbet(winner.getTotalbet() + normalShare);
+                winner.setTotalBet(winner.getTotalBet() + normalShare);
                 payouts.put(winner, normalShare);
                 if (i < normalRemainder) {
-                    winner.setTotalbet(winner.getTotalbet() + 1);
+                    winner.setTotalBet(winner.getTotalBet() + 1);
                     payouts.put(winner, payouts.get(winner) + 1);
                 }
             }
@@ -230,7 +225,7 @@ public class Game {
         if (!allInWinners.isEmpty()) {
             int totalAllInBet = 0;
             for (Player winner : allInWinners) {
-                winner.setTotalbet(winner.getTotalbet() + winner.getTotalMoney());
+                winner.setTotalBet(winner.getTotalBet() + winner.getTotalMoney());
                 payouts.put(winner, winner.getTotalMoney());
                 totalAllInBet += winner.getTotalMoney();
             }
@@ -239,10 +234,10 @@ public class Game {
             for (int i = 0; i < allInWinners.size(); i++) {
                 Player winner = allInWinners.get(i);
                 if (i < allInRemainder) {
-                    winner.setTotalbet(winner.getTotalbet() + allInShare + 1);
+                    winner.setTotalBet(winner.getTotalBet() + allInShare + 1);
                     payouts.put(winner, payouts.get(winner) + allInShare + 1);
                 } else {
-                    winner.setTotalbet(winner.getTotalbet() + allInShare);
+                    winner.setTotalBet(winner.getTotalBet() + allInShare);
                     payouts.put(winner, payouts.get(winner) + allInShare);
                 }
             }
@@ -251,68 +246,69 @@ public class Game {
         return payouts;
     }
     private void blind(){
-        playeringame.get(smallblindpointer).bet(smallblind);
-        playeringame.get(bigblindpointer).bet(smallblind*2);
-        if (playeringame.get(bigblindpointer).getMoney()==0){
-            playeringame.get(bigblindpointer).setStatus("ALLIN");
-            allincount++;
+        playerInGame.get(smallBlindPointer).bet(smallBlind);
+        playerInGame.get(bigBlindPointer).bet(smallBlind *2);
+        if (playerInGame.get(bigBlindPointer).getMoney()==0){
+            playerInGame.get(bigBlindPointer).setStatus("ALLIN");
+            allInCounter++;
         }
-        pot+=smallblind*3;
+        pot+= smallBlind *3;
     }
 
 
-    private void resetPlayer(ArrayList<Player> playerlist) {
-        for (Player x :playerlist){
+    private void resetPlayer(ArrayList<Player> playerList) {
+        for (Player x :playerList){
             x.resetStatus();
-            x.resettotalbet();
-            x.clearhand();
+            x.resetTotalBet();
+            x.ClearHand();
         }
     }
 
 
-    private void betsession(ArrayList<Player> playerlist) {
+    private void betSession(ArrayList<Player> playerInGame) {
         //显示公共牌
+        //暂时有大bug，到底用哪个list要重新review
         System.out.println("公共牌为：");
-        for(Card x:communitycard){
+        for(Card x: communityCard){
             x.print();
         }
         //从小盲开始轮流下注
         int count=0;
-        for (int i =smallblindpointer;
+        for (int i = smallBlindPointer;
              true;
              i++
         ){
 
-            if(i>=playerlist.size()){
+            if(i>=playerInGame.size()){
                 i=0;
             }
             //判断是否allin了
 
             count++;
             //判断不在ALLIN状态
-            if (playerlist.get(i).getStatus()!="ALLIN") {
+            if (!playerInGame.get(i).getStatus().equals("ALLIN")) {
                 //显示手牌
-                System.out.println("玩家" + playerlist.get(i).getPlayerid() + "你的手牌是：");
-                playerlist.get(i).getHand().get(0).print();
-                playerlist.get(i).getHand().get(1).print();
+                System.out.println("玩家" + playerInGame.get(i).getPlayerId() + "你的手牌是：");
+                playerInGame.get(i).getHand().get(0).print();
+                playerInGame.get(i).getHand().get(1).print();
                 //显示筹码
-                System.out.println( "你的剩余筹码为：" + playerlist.get(i).getMoney());
+                System.out.println( "你的剩余筹码为：" + playerInGame.get(i).getMoney());
                 //下注并修改状态
-                if(betnum>playerlist.get(i).getTotalbet()){
-                    if(playerlist.get(i).getMoney()+playerlist.get(i).getTotalbet()<=betnum){
+                if(betNum >playerInGame.get(i).getTotalBet()){
+                    if(playerInGame.get(i).getMoney()+playerInGame.get(i).getTotalBet()<= betNum){
                         while(true){
                             System.out.println("请选择你的行动（allin或者fold）");
                             String action = scan.next();
                             if(action.equals("allin")){
-                                playerlist.get(i).setStatus("ALLIN");
-                                pot += playerlist.get(i).getMoney();
-                                playerlist.get(i).bet(playerlist.get(i).getMoney());
-                                betnum=playerlist.get(i).getTotalbet();
-                                allincount++;
+                                playerInGame.get(i).setStatus("ALLIN");
+                                pot += playerInGame.get(i).getMoney();
+                                playerInGame.get(i).bet(playerInGame.get(i).getMoney());
+                                betNum =playerInGame.get(i).getTotalBet();
+                                allInCounter++;
                                 break;
                             }else if(action.equals("fold")){
-                                playerlist.get(i).setStatus("FOLD");
-                                playeringame.remove(playerlist.get(i));
+                                playerInGame.get(i).setStatus("FOLD");
+                                this.playerInGame.remove(playerInGame.get(i));
                                 count--;
                                 i--;
                                 break;
@@ -326,14 +322,14 @@ public class Game {
                             if (action.equals("bet")) {
                                 while (true) {
                                     System.out.println("请下注：");
-                                    int playerbet = scan.nextInt();
-                                    if (playerbet <= playerlist.get(i).getMoney()&&playerbet+playerlist.get(i).getTotalbet()>=betnum) {
-                                        playerlist.get(i).bet(playerbet);
-                                        betnum=playerlist.get(i).getTotalbet();
-                                        pot += playerbet;
-                                        if (playerlist.get(i).getMoney() == playerbet) {
-                                            playerlist.get(i).setStatus("ALLIN");
-                                            allincount++;
+                                    int playerBet = scan.nextInt();
+                                    if (playerBet <= playerInGame.get(i).getMoney()&&playerBet+playerInGame.get(i).getTotalBet()>= betNum) {
+                                        playerInGame.get(i).bet(playerBet);
+                                        betNum =playerInGame.get(i).getTotalBet();
+                                        pot += playerBet;
+                                        if (playerInGame.get(i).getMoney() == playerBet) {
+                                            playerInGame.get(i).setStatus("ALLIN");
+                                            allInCounter++;
                                         }
                                         break;
                                     }
@@ -341,15 +337,15 @@ public class Game {
                                 }
                                 break;
                             } else if (action.equals("allin")) {
-                                playerlist.get(i).setStatus("ALLIN");
-                                pot += playerlist.get(i).getMoney();
-                                playerlist.get(i).bet(playerlist.get(i).getMoney());
-                                betnum=playerlist.get(i).getTotalbet();
-                                allincount++;
+                                playerInGame.get(i).setStatus("ALLIN");
+                                pot += playerInGame.get(i).getMoney();
+                                playerInGame.get(i).bet(playerInGame.get(i).getMoney());
+                                betNum =playerInGame.get(i).getTotalBet();
+                                allInCounter++;
                                 break;
                             } else if (action.equals("fold")) {
-                                playerlist.get(i).setStatus("FOLD");
-                                playeringame.remove(playerlist.get(i));
+                                playerInGame.get(i).setStatus("FOLD");
+                                this.playerInGame.remove(playerInGame.get(i));
                                 count--;
                                 i--;
                                 break;
@@ -364,25 +360,25 @@ public class Game {
                         if (action.equals("bet")) {
                             while(true) {
                                 System.out.println("请下注：");
-                                int playerbet = scan.nextInt();
-                                if (playerbet <= playerlist.get(i).getMoney()&&playerbet+playerlist.get(i).getTotalbet()>=betnum){
-                                    playerlist.get(i).bet(playerbet);
-                                    betnum=playerlist.get(i).getTotalbet();
-                                    pot+=playerbet;
+                                int playerBet = scan.nextInt();
+                                if (playerBet <= playerInGame.get(i).getMoney()&&playerBet+playerInGame.get(i).getTotalBet()>= betNum){
+                                    playerInGame.get(i).bet(playerBet);
+                                    betNum =playerInGame.get(i).getTotalBet();
+                                    pot+=playerBet;
                                     break;
                                 }
                                 System.out.println("下注不合法，请重新下注");
                             }
                             break;
                         } else if (action.equals("allin")) {
-                            playerlist.get(i).setStatus("ALLIN");
-                            pot+=playerlist.get(i).getMoney();
-                            playerlist.get(i).bet(playerlist.get(i).getMoney());
-                            betnum=playerlist.get(i).getTotalbet();
+                            playerInGame.get(i).setStatus("ALLIN");
+                            pot+=playerInGame.get(i).getMoney();
+                            playerInGame.get(i).bet(playerInGame.get(i).getMoney());
+                            betNum =playerInGame.get(i).getTotalBet();
                             break;
                         } else if (action.equals("fold")) {
-                            playerlist.get(i).setStatus("FOLD");
-                            playeringame.remove(playerlist.get(i));
+                            playerInGame.get(i).setStatus("FOLD");
+                            this.playerInGame.remove(playerInGame.get(i));
                             count--;
                             i--;
                             break;
@@ -394,21 +390,21 @@ public class Game {
                 }
 
                 int n=i+1;
-                if(n>=playerlist.size()){
+                if(n>=playerInGame.size()){
                     n=0;
                 }
-                if(allincount>=playerlist.size()-1&&playerlist.get(n).getStatus().equals("ALLIN")){
+                if(allInCounter >=playerInGame.size()-1&&playerInGame.get(n).getStatus().equals("ALLIN")){
                     allIn=true;
                     break;
                 }
                 //一轮以后 判断是否要继续下注
-                if(count>=playerlist.size()){
-                    if(i+1>=playerlist.size()){
-                        if(playerlist.get(i).getTotalbet()==playerlist.get(0).getTotalbet()){
+                if(count>=playerInGame.size()){
+                    if(i+1>=playerInGame.size()){
+                        if(playerInGame.get(i).getTotalBet()==playerInGame.get(0).getTotalBet()){
                             break;
                         }
                     } else {
-                        if(playerlist.get(i).getTotalbet()==playerlist.get(i+1).getTotalbet()){
+                        if(playerInGame.get(i).getTotalBet()==playerInGame.get(i+1).getTotalBet()){
                             break;
                         }
                     }
@@ -417,35 +413,34 @@ public class Game {
         }
 
     }
-    private void deliverCard(){
-        for(Player x:playerlist){
-            x.handcard(deck1);
+    private void deliverCard(ArrayList<Player> playerInGame){
+        for(Player x:playerInGame){
+            x.HandCard(deck1);
         }
     }
     private void haveEnoughChips(){
-        for (int i=0;i<playerlist.size();i++) {
-            if(playerlist.get(i).getMoney()<smallblind*2){
-                System.out.println("玩家"+playerlist.get(i).getPlayerid()+"的筹码不足，被淘汰");
-                playerlist.remove(i);
+        for (int i = 0; i< playerList.size(); i++) {
+            if(playerList.get(i).getMoney()< smallBlind *2){
+                System.out.println("玩家"+ playerList.get(i).getPlayerId()+"的筹码不足，被淘汰");
+                playerList.remove(i);
                 i--;
             }
         }
     }
-    private ArrayList<Player> findWinner(ArrayList<Player> playerlist,ArrayList<Card> communityCards){
+    private ArrayList<Player> findWinner(ArrayList<Player> playerList,ArrayList<Card> communityCards){
         ArrayList<Player> winnerList=new ArrayList<>();
-        winnerList.add(playerlist.get(0));
-        for(int i=1;i<playerlist.size();i++){
-            if (compareHands(playerlist.get(i).getHand(),winnerList.get(0).getHand(),communityCards)==1){
+        winnerList.add(playerList.get(0));
+        for(int i=1;i<playerList.size();i++){
+            if (compareHands(playerList.get(i).getHand(),winnerList.get(0).getHand(),communityCards)==1){
                 winnerList.clear();
-                winnerList.add(playerlist.get(i));
-            } else if(compareHands(playerlist.get(i).getHand(),winnerList.get(0).getHand(),communityCards)==-1){
-            } else {
-                winnerList.add(playerlist.get(i));
+                winnerList.add(playerList.get(i));
+            } else if(compareHands(playerList.get(i).getHand(),winnerList.get(0).getHand(),communityCards)==0){
+                winnerList.add(playerList.get(i));
             }
         }
         return winnerList;
     }
-    public static int compareHands(ArrayList<Card> player1Hand, ArrayList<Card> player2Hand, ArrayList<Card> communityCards) {
+    private static int compareHands(ArrayList<Card> player1Hand, ArrayList<Card> player2Hand, ArrayList<Card> communityCards) {
         int player1Rank = evaluateHand(player1Hand, communityCards);
         int player2Rank = evaluateHand(player2Hand, communityCards);
 
@@ -712,7 +707,7 @@ public class Game {
     }
     private static boolean isFlush(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size() - 1; i++) {
-            if (cards.get(i).getColor() != cards.get(i + 1).getColor())
+            if (!cards.get(i).getColor().equals(cards.get(i + 1).getColor()))
                 return false;
         }
     return true;
@@ -745,7 +740,7 @@ public class Game {
         return countPairs == 2;
     }
 
-    public static boolean isOnePair(ArrayList<Card> cards) {
+    private static boolean isOnePair(ArrayList<Card> cards) {
         for (int i = 0; i < cards.size() - 1; i++) {
             if (cards.get(i).getNum() == cards.get(i+1).getNum()) {
                 return true;

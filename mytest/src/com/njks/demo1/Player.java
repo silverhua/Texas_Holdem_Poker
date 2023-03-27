@@ -3,31 +3,31 @@ package com.njks.demo1;
 import java.util.ArrayList;
 
 public class Player implements Comparable<Player>{
-    private int playerid;
+    private int playerId;
     private int money;
     private ArrayList<Card> hand = new ArrayList<>();
-    private int totalbet;
+    private int totalBet;
     private String status="default";
     public Player(int id,int money){
-        this.playerid=id;
+        this.playerId =id;
         this.money=money;
     }
-    public void handcard(CardDeck deck){
+    public void HandCard(CardDeck deck){
         hand.add(deck.drawCard());
         hand.add(deck.drawCard());
     }
-    public void clearhand(){
+    public void ClearHand(){
         hand.clear();
     }
-    public void showhand(){
-        hand.get(0).print();
-        hand.get(1).print();
-    }
+//    public void showHand(){
+//        hand.get(0).print();
+//        hand.get(1).print();
+//    }
     public void bet(int bet){
         money=money-bet;
-        totalbet+=bet;
+        totalBet +=bet;
     }
-    public void winpot(int pot){
+    public void winPot(int pot){
         money=money+pot;
     }
 
@@ -35,8 +35,8 @@ public class Player implements Comparable<Player>{
         return money;
     }
 
-    public int getPlayerid() {
-        return playerid;
+    public int getPlayerId() {
+        return playerId;
     }
 
     public ArrayList<Card> getHand() {
@@ -55,23 +55,23 @@ public class Player implements Comparable<Player>{
         status="default";
     }
 
-    public int getTotalbet() {
-        return totalbet;
+    public int getTotalBet() {
+        return totalBet;
     }
-    public void resettotalbet(){
-        totalbet=0;
+    public void resetTotalBet(){
+        totalBet =0;
     }
 
-    public void setTotalbet(int totalbet) {
-        this.totalbet = totalbet;
+    public void setTotalBet(int totalBet) {
+        this.totalBet = totalBet;
     }
     public int getTotalMoney() {
-        return money + totalbet;
+        return money + totalBet;
     }
     public int compareTo(Player otherPlayer) {
-        if (this.totalbet > otherPlayer.getTotalbet()) {
+        if (this.totalBet > otherPlayer.getTotalBet()) {
             return 1;
-        } else if (this.totalbet < otherPlayer.getTotalbet()) {
+        } else if (this.totalBet < otherPlayer.getTotalBet()) {
             return -1;
         } else {
             return 0;
