@@ -103,19 +103,15 @@ public class Game {
                 }
                 //分钱
                 potDeliver(playerInGame, communityCard);
-                //判断是否有人淘汰
-                haveEnoughChips();
-                //下一个人小盲
-                nextSmallBlind();
             }else {
                 System.out.println("玩家" + playerInGame.get(0).getPlayerId() + "赢得比赛");
                 playerInGame.get(0).winPot(pot);
                 System.out.println("玩家" + playerInGame.get(0).getPlayerId() + "赢得" + pot);
-                //判断是否有人淘汰
-                haveEnoughChips();
-                //下一个人小盲
-                nextSmallBlind();
             }
+            //判断是否有人淘汰
+            haveEnoughChips();
+            //下一个人小盲
+            nextSmallBlind();
         }
         System.out.println("玩家"+ playerList.get(0).getPlayerId()+"是最终赢家");
         System.out.println("他的最终筹码是："+ playerList.get(0).getMoney());
@@ -188,7 +184,6 @@ public class Game {
         // divide the pot among the winners
         int numWinners = winners.size();
         int share = pot / numWinners;
-        int remainder = pot % numWinners;
 
         // determine which winners are all-in and which ones can call full share
         List<Player> allInWinners = new ArrayList<>();
@@ -202,8 +197,8 @@ public class Game {
         }
 
         // distribute the pot among the normal winners first
-        int normalShare = share;
-        int normalRemainder = remainder;
+        int normalShare;
+        int normalRemainder;
         Map<Player, Integer> payouts = new HashMap<>();
         if (!normalWinners.isEmpty()) {
             normalShare = pot / normalWinners.size();
@@ -220,8 +215,8 @@ public class Game {
         }
 
         // distribute the remainder of the pot among the all-in winners
-        int allInShare = 0;
-        int allInRemainder = 0;
+        int allInShare;
+        int allInRemainder;
         if (!allInWinners.isEmpty()) {
             int totalAllInBet = 0;
             for (Player winner : allInWinners) {
@@ -313,81 +308,80 @@ public class Game {
                             System.out.println("输入错误，请重新输入");
                         }
                     }else {
+                        label:
                         while (true) {
                             System.out.println("请选择你的行动（call, raise, allin或fold）");
                             String action = scan.next();
-                            if (action.equals("raise")) {
-                                while (true) {
-                                    System.out.println("请下注：");
-                                    int playerBet = scan.nextInt();
-                                    if (playerBet <= playerInGame.get(i).getMoney()&&playerBet+playerInGame.get(i).getTotalBet()>= betNum) {
-                                        playerInGame.get(i).bet(playerBet);
-                                        betNum =playerInGame.get(i).getTotalBet();
-                                        pot += playerBet;
-                                        if (playerInGame.get(i).getMoney() == playerBet) {
-                                            playerInGame.get(i).setStatus("ALLIN");
+                            switch (action) {
+                                case "raise":
+                                    while (true) {
+                                        System.out.println("请下注：");
+                                        int playerBet = scan.nextInt();
+                                        if (playerBet <= playerInGame.get(i).getMoney() && playerBet + playerInGame.get(i).getTotalBet() >= betNum) {
+                                            playerInGame.get(i).bet(playerBet);
+                                            betNum = playerInGame.get(i).getTotalBet();
+                                            pot += playerBet;
+                                            if (playerInGame.get(i).getMoney() == playerBet) {
+                                                playerInGame.get(i).setStatus("ALLIN");
+                                            }
+                                            break;
                                         }
-                                        break;
+                                        System.out.println("下注不合法，请重新下注");
                                     }
-                                    System.out.println("下注不合法，请重新下注");
-                                }
-                                break;
-                            } else if (action.equals("allin")) {
-                                playerInGame.get(i).setStatus("ALLIN");
-                                pot += playerInGame.get(i).getMoney();
-                                playerInGame.get(i).bet(playerInGame.get(i).getMoney());
-                                betNum =playerInGame.get(i).getTotalBet();
-                                break;
-                            } else if (action.equals("fold")) {
-                                playerInGame.get(i).setStatus("FOLD");
-                                this.playerInGame.remove(playerInGame.get(i));
-                                count--;
-                                if(i<smallBlindPointer-foldCounter) {
-                                    foldCounter++;
-                                }
-                                i--;
-                                break;
-                            } else if (action.equals("call")) {
-                                playerInGame.get(i).bet(betNum-playerInGame.get(i).getTotalBet());
-                                pot = pot+betNum-playerInGame.get(i).getTotalBet();
-                                break;
+                                    break label;
+                                case "allin":
+                                    playerInGame.get(i).setStatus("ALLIN");
+                                    pot += playerInGame.get(i).getMoney();
+                                    playerInGame.get(i).bet(playerInGame.get(i).getMoney());
+                                    betNum = playerInGame.get(i).getTotalBet();
+                                    break label;
+                                case "fold":
+                                    playerInGame.get(i).setStatus("FOLD");
+                                    this.playerInGame.remove(playerInGame.get(i));
+                                    count--;
+                                    if (i < smallBlindPointer - foldCounter) {
+                                        foldCounter++;
+                                    }
+                                    i--;
+                                    break label;
+                                case "call":
+                                    playerInGame.get(i).bet(betNum - playerInGame.get(i).getTotalBet());
+                                    pot = pot + betNum - playerInGame.get(i).getTotalBet();
+                                    break label;
                             }
                             System.out.println("输入错误，请重新输入");
                         }
                     }
                 } else{
+                    label1:
                     while(true) {
                         System.out.println("请选择你的行动（hold,bet或allin）");
                         String action = scan.next();
-                        if (action.equals("bet")) {
-                            while(true) {
-                                System.out.println("请下注：");
-                                int playerBet = scan.nextInt();
-                                if (playerBet <= playerInGame.get(i).getMoney()&&playerBet+playerInGame.get(i).getTotalBet()>= betNum){
-                                    playerInGame.get(i).bet(playerBet);
-                                    betNum =playerInGame.get(i).getTotalBet();
-                                    pot+=playerBet;
-                                    break;
+                        switch (action) {
+                            case "bet":
+                                while (true) {
+                                    System.out.println("请下注：");
+                                    int playerBet = scan.nextInt();
+                                    if (playerBet <= playerInGame.get(i).getMoney() && playerBet + playerInGame.get(i).getTotalBet() >= betNum) {
+                                        playerInGame.get(i).bet(playerBet);
+                                        betNum = playerInGame.get(i).getTotalBet();
+                                        pot += playerBet;
+                                        break;
+                                    }
+                                    System.out.println("下注不合法，请重新下注");
                                 }
-                                System.out.println("下注不合法，请重新下注");
-                            }
-                            break;
-                        } else if (action.equals("allin")) {
-                            playerInGame.get(i).setStatus("ALLIN");
-                            pot+=playerInGame.get(i).getMoney();
-                            playerInGame.get(i).bet(playerInGame.get(i).getMoney());
-                            betNum =playerInGame.get(i).getTotalBet();
-                            break;
-                        } else if (action.equals("hold")){
-                            break;
+                                break label1;
+                            case "allin":
+                                playerInGame.get(i).setStatus("ALLIN");
+                                pot += playerInGame.get(i).getMoney();
+                                playerInGame.get(i).bet(playerInGame.get(i).getMoney());
+                                betNum = playerInGame.get(i).getTotalBet();
+                                break label1;
+                            case "hold":
+                                break label1;
                         }
                         System.out.println("输入错误，请重新输入");
                     }
-                }
-
-                int n=i+1;
-                if(n>=playerInGame.size()){
-                    n=0;
                 }
                 if(checkAllIn(playerInGame)){
                     allIn=true;
@@ -416,11 +410,7 @@ public class Game {
                 allInCounter++;
             }
         }
-        if(allInCounter>=playerInGame.size()-1){
-            return true;
-        }else {
-            return false;
-        }
+        return allInCounter >= playerInGame.size() - 1;
     }
     private void deliverCard(ArrayList<Player> playerInGame){
         for(Player x:playerInGame){
@@ -460,36 +450,33 @@ public class Game {
         } else {
             ArrayList<Card> player1Combined = new ArrayList<>(player1Hand);
             player1Combined.addAll(communityCards);
-            Collections.sort(player1Combined, Collections.reverseOrder());
+            player1Combined.sort(Collections.reverseOrder());
 
             ArrayList<Card> player2Combined = new ArrayList<>(player2Hand);
             player2Combined.addAll(communityCards);
-            Collections.sort(player2Combined, Collections.reverseOrder());
+            player2Combined.sort(Collections.reverseOrder());
 
-            switch (player1Rank) {
-                case 10: // Royal Flush
-                    return 0; // Royal Flushes will always be a tie
-                case 9: // Straight Flush
-                    return compareStraightFlushes(player1Combined, player2Combined);
-                case 8: // Four of a Kind
-                    return compareFourOfAKind(player1Combined, player2Combined);
-                case 7: // Full House
-                    return compareFullHouses(player1Combined, player2Combined);
-                case 6: // Flush
-                    return compareFlushes(player1Combined, player2Combined);
-                case 5: // Straight
-                    return compareStraights(player1Combined, player2Combined);
-                case 4: // Three of a Kind
-                    return compareThreeOfAKind(player1Combined, player2Combined);
-                case 3: // Two Pair
-                    return compareTwoPairs(player1Combined, player2Combined);
-                case 2: // One Pair
-                    return comparePairs(player1Combined, player2Combined);
-                case 1: // High Card
-                    return compareHighCard(player1Combined, player2Combined);
-                default:
-                    throw new IllegalStateException("Unexpected hand rank: " + player1Rank);
-            }
+            return switch (player1Rank) {
+                case 10 -> // Royal Flush
+                        0; // Royal Flushes will always be a tie
+                case 9 | 5 -> // Straight Flush or Straight
+                        compareStraights(player1Combined, player2Combined);
+                case 8 -> // Four of a Kind
+                        compareFourOfAKind(player1Combined, player2Combined);
+                case 7 -> // Full House
+                        compareFullHouses(player1Combined, player2Combined);
+                case 6 -> // Flush
+                        compareFlushes(player1Combined, player2Combined);
+                case 4 -> // Three of a Kind
+                        compareThreeOfAKind(player1Combined, player2Combined);
+                case 3 -> // Two Pair
+                        compareTwoPairs(player1Combined, player2Combined);
+                case 2 -> // One Pair
+                        comparePairs(player1Combined, player2Combined);
+                case 1 -> // High Card
+                        compareHighCard(player1Combined, player2Combined);
+                default -> throw new IllegalStateException("Unexpected hand rank: " + player1Rank);
+            };
         }
     }
 
@@ -508,7 +495,7 @@ public class Game {
         Card pair1 = getPair(player1);
         Card pair2 = getPair(player2);
 
-        if (pair1.getNum() > pair2.getNum()) {
+        if (Objects.requireNonNull(pair1).getNum() > Objects.requireNonNull(pair2).getNum()) {
             return 1;
         } else if (pair1.getNum() < pair2.getNum()) {
             return -1;
@@ -568,7 +555,7 @@ public class Game {
     private static int compareThreeOfAKind(ArrayList<Card> player1, ArrayList<Card> player2) {
         Card three1 = getThreeOfAKind(player1);
         Card three2 = getThreeOfAKind(player2);
-        if (three1.getNum() > three2.getNum()) {
+        if (Objects.requireNonNull(three1).getNum() > Objects.requireNonNull(three2).getNum()) {
             return 1;
         } else if (three1.getNum() < three2.getNum()) {
             return -1;
@@ -587,7 +574,7 @@ public class Game {
     private static int compareStraights(ArrayList<Card> player1, ArrayList<Card> player2) {
         Card high1 = getStraightHighCard(player1);
         Card high2 = getStraightHighCard(player2);
-        if (high1.getNum() > high2.getNum()) {
+        if (Objects.requireNonNull(high1).getNum() > Objects.requireNonNull(high2).getNum()) {
             return 1;
         } else if (high1.getNum() < high2.getNum()) {
             return -1;
@@ -613,11 +600,11 @@ public class Game {
         Card three2 = getThreeOfAKind(player2);
         Card pair1 = getPair(removeThreeOfAKind(player1, three1));
         Card pair2 = getPair(removeThreeOfAKind(player2, three2));
-        if (three1.getNum() > three2.getNum()) {
+        if (Objects.requireNonNull(three1).getNum() > Objects.requireNonNull(three2).getNum()) {
             return 1;
         } else if (three1.getNum() < three2.getNum()) {
             return -1;
-        } else if (pair1.getNum() > pair2.getNum()) {
+        } else if (Objects.requireNonNull(pair1).getNum() > Objects.requireNonNull(pair2).getNum()) {
             return 1;
         } else if (pair1.getNum() < pair2.getNum()) {
             return -1;
@@ -634,7 +621,7 @@ public class Game {
     private static int compareFourOfAKind(ArrayList<Card> player1, ArrayList<Card> player2) {
         Card four1 = getFourOfAKind(player1);
         Card four2 = getFourOfAKind(player2);
-        if (four1.getNum() > four2.getNum()) {
+        if (Objects.requireNonNull(four1).getNum() > Objects.requireNonNull(four2).getNum()) {
             return 1;
         } else if (four1.getNum() < four2.getNum()) {
             return -1;
@@ -651,23 +638,13 @@ public class Game {
         }
         return null;
     }
-    private static int compareStraightFlushes(ArrayList<Card> player1, ArrayList<Card> player2) {
-        Card high1 = getStraightHighCard(player1);
-        Card high2 = getStraightHighCard(player2);
-        if (high1.getNum() > high2.getNum()) {
-            return 1;
-        } else if (high1.getNum() < high2.getNum()) {
-            return -1;
-        }
-        return 0;
-    }
     private static int evaluateHand(ArrayList<Card> hand, ArrayList<Card> communityCards) {
         ArrayList<Card> allCards = new ArrayList<>();
         allCards.addAll(hand);
         allCards.addAll(communityCards);
 
         // sort the cards in descending order by rank
-        Collections.sort(allCards, Collections.reverseOrder());
+        allCards.sort(Collections.reverseOrder());
 
         // check for the different hand combinations in descending order of strength
         if (isRoyalFlush(allCards)) {

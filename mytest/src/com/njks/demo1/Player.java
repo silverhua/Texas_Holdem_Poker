@@ -3,9 +3,9 @@ package com.njks.demo1;
 import java.util.ArrayList;
 
 public class Player implements Comparable<Player>{
-    private int playerId;
+    private final int playerId;
     private int money;
-    private ArrayList<Card> hand = new ArrayList<>();
+    private final ArrayList<Card> hand = new ArrayList<>();
     private int totalBet;
     private String status="default";
     public Player(int id,int money){
@@ -19,10 +19,7 @@ public class Player implements Comparable<Player>{
     public void ClearHand(){
         hand.clear();
     }
-//    public void showHand(){
-//        hand.get(0).print();
-//        hand.get(1).print();
-//    }
+
     public void bet(int bet){
         money=money-bet;
         totalBet +=bet;

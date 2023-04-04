@@ -1,11 +1,9 @@
 package com.njks.demo1;
 
 public class Card implements Comparable<Card>{
-        private String color;
-        private int num;
-        private String x;
-        public Card(){
-        }
+        private final String color;
+        private final int num;
+        private final String x;
         public Card(String n,int m){
             color =n;
             num=m;
@@ -26,25 +24,10 @@ public class Card implements Comparable<Card>{
             return color;
         }
 
-        public void setColor(String color) {
-            this.color = color;
-        }
-
         public int getNum() {
             return num;
         }
 
-        public void setNum(int num) {
-            this.num = num;
-        }
-
-        public String getX() {
-            return x;
-        }
-
-        public void setX(String x) {
-            this.x = x;
-        }
         public void print(){
             System.out.println(color+x);
         }
